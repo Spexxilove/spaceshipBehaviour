@@ -1,0 +1,5 @@
+*.info
+*.log
+Swarm/Library/metadata/
+Swarm/Temp/
+Swarm/Library/ShaderCache/
