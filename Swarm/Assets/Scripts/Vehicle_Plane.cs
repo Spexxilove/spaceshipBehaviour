@@ -18,8 +18,8 @@ public class Vehicle_Plane : Vehicle {
 
 		maxSpeed = 1000.0f;
 		maxForce = 250.0f;
-		maxRollRate = 60.0f;
-		maxPitchRate = 45.0f;
+		maxRollRate = 45.0f;
+		maxPitchRate = 30.0f;
 
 		minForce = -100.0f;
 	}
@@ -35,19 +35,16 @@ public class Vehicle_Plane : Vehicle {
 
 			Vector3 localDesiredVelocity = vehicleObj.transform.InverseTransformVector (currentVelocity + steeringForce);
 		if (localDesiredVelocity.sqrMagnitude > 0.0) {
-			//float pitch = 90.0f - (180.0f / (Mathf.PI) * Mathf.Acos (Vector3.Dot (new Vector3 (localDesiredVelocity.x, localDesiredVelocity.y, localDesiredVelocity.z), new Vector3 (-localDesiredVelocity.x, -localDesiredVelocity.y, 0.0f)) / (new Vector3 (0.0f, localDesiredVelocity.y, localDesiredVelocity.z).magnitude * localDesiredVelocity.magnitude)));
-			//float roll = 90.0f - (180.0f / (Mathf.PI) * Mathf.Acos (Vector3.Dot (new Vector3 (localDesiredVelocity.x, localDesiredVelocity.y, 0.0f), Vector3.left) / (new Vector3 (localDesiredVelocity.x, localDesiredVelocity.y, 0.0f).magnitude)));
 
 			float pitch = Vector3.Angle (Vector3.forward, localDesiredVelocity)*Mathf.Sign(Vector3.Dot(Vector3.down, localDesiredVelocity));
-
 			float roll = Vector3.Angle (Vector3.up, new Vector3 (localDesiredVelocity.x, localDesiredVelocity.y, 0.0f))*Mathf.Sign(Vector3.Dot(pitch>0.0f ? Vector3.right : Vector3.left, localDesiredVelocity));
-				
-			if (Mathf.Abs (pitch) < 1.0f) {
-				pitch = 0.0f;
-				roll = 0.0f;
-			}
 
-			roll = Mathf.Abs (roll) < 1.0f ? 0.0f : roll;
+			//set small rotation to zero to remove jitter
+//			if (Mathf.Abs (pitch) < 1.0f) {
+//				pitch = 0.0f;
+//				roll = 0.0f;
+//			}
+			//roll = Mathf.Abs (roll) < 1.0f ? 0.0f : roll;
 
 
 			pitch = Mathf.Min (maxPitchRate * timestep, Mathf.Abs (pitch)) * Mathf.Sign (pitch);

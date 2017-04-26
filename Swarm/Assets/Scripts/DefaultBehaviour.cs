@@ -22,7 +22,9 @@ public class DefaultBehaviour : VehicleBehaviour {
 	public override Vector3 calculate(){
 		Vector3 steeringForce = Vector3.zero;
 		//steeringForce += seek (target);
-		steeringForce += arrive (target);
+		//steeringForce += arrive (target);
+		//steeringForce += flee (target);
+		steeringForce = wander ();
 		return steeringForce;
 	}
 
@@ -35,11 +37,11 @@ public class DefaultBehaviour : VehicleBehaviour {
 		return desiredV - vehicle.getCurrentVelocity ();
 	}
 
-//	//flee from target
-//	public Vector3 flee(){
-//
-//		return null;
-//	}
+	//flee from target
+	public Vector3 flee(Vector3 targetPos){
+		Vector3 desiredV = vehicle.getMaxSpeed() * (Vector3.Normalize ( vehicle.getPosition()-targetPos));
+		return desiredV - vehicle.getCurrentVelocity ();
+	}
 
 	//similar to seek but decelerates close to target
 	public Vector3 arrive(Vector3 targetPos){
@@ -53,6 +55,22 @@ public class DefaultBehaviour : VehicleBehaviour {
 
 		Vector3 desiredV =desiredSpeed * (Vector3.Normalize (targetPos - currentPos));
 		return desiredV - vehicle.getCurrentVelocity ();
+	}
+
+	//wander in random direction in a smooth fashion
+
+	private Vector3 wanderTarget = Vector3.forward;
+	private float wanderRadius =1f;
+	private float wanderRadiusScaleY = 10.0f;
+	private float wanderDistance =10.0f; //distance of 
+	private float wanderJitter = 0.01f; // amount of wander change per update
+	public Vector3 wander(){
+		Vector3 newTarget = wanderTarget + Random.insideUnitSphere*wanderJitter;
+		newTarget.Normalize ();
+		wanderTarget = newTarget;
+		newTarget.Scale (new Vector3 (1.0f, wanderRadiusScaleY, 1.0f));
+		newTarget = newTarget * wanderRadius + wanderDistance * Vector3.forward;
+		return vehicle.getTransform().TransformVector (newTarget);
 	}
 
 	//pursuit

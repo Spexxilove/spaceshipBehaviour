@@ -26,6 +26,10 @@ public class Vehicle {
 		return vehicleObj.transform.position;
 	}
 
+	public Transform getTransform(){
+		return vehicleObj.transform;
+	}
+
 	public float getMaxSpeed(){
 		return maxSpeed;
 	}
