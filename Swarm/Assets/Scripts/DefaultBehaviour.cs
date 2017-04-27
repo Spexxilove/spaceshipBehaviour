@@ -57,20 +57,32 @@ public class DefaultBehaviour : VehicleBehaviour {
 		return desiredV - vehicle.getCurrentVelocity ();
 	}
 
-	//wander in random direction in a smooth fashion
 
-	private Vector3 wanderTarget = Vector3.forward;
-	private float wanderRadius =1f;
-	private float wanderRadiusScaleY = 10.0f;
-	private float wanderDistance =10.0f; //distance of 
-	private float wanderJitter = 0.01f; // amount of wander change per update
+
+	//second atempt at wander
+	private Vector3 wanderTarget = Vector3.zero;
+	private float setNewTargetProbability = 0.005f;
+	private int maxTurnTime  = 3000; // max amount of updates to turn in new direction
+	private int currentTurnTime=0; // remaining updates to turn
+	private int turnTime  = 0; // time for this  turn
 	public Vector3 wander(){
-		Vector3 newTarget = wanderTarget + Random.insideUnitSphere*wanderJitter;
-		newTarget.Normalize ();
-		wanderTarget = newTarget;
-		newTarget.Scale (new Vector3 (1.0f, wanderRadiusScaleY, 1.0f));
-		newTarget = newTarget * wanderRadius + wanderDistance * Vector3.forward;
-		return vehicle.getTransform().TransformVector (newTarget);
+		if(wanderTarget == Vector3.zero){ // first call of wander
+			wanderTarget= vehicle.getTransform().forward;
+		}
+
+		if (Random.value <= setNewTargetProbability) {// set new target direction
+			wanderTarget = Random.onUnitSphere;
+			turnTime = Random.Range(0,maxTurnTime);
+			currentTurnTime = turnTime;
+		}
+			
+		// seek current target direction
+		if (currentTurnTime > 1) {
+			currentTurnTime--;
+			return ( vehicle.getCurrentVelocity ()* currentTurnTime - wanderTarget * vehicle.getMaxSpeed () * (turnTime - currentTurnTime))/turnTime;
+		} else {
+			return (wanderTarget * vehicle.getMaxSpeed ()  - vehicle.getCurrentVelocity ());
+		}
 	}
 
 	//pursuit
